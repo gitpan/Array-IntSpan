@@ -1,7 +1,17 @@
 Array/IntSpan.pm
+Array/IntSpan/Fields.pm
 Array/IntSpan/IP.pm
-Changes
-Makefile.PL
+ChangeLog
 MANIFEST
+Makefile.PL
 README
-test.pl
+t/clobbered_items.t
+t/consolidate.t
+t/empty_span.t
+t/fields.t
+t/get_range.t
+t/get_range.t.ptkdb
+t/get_splice_parms.t
+t/search.t
+t/set_range.t
+META.yml                                 Module meta-data (added by MakeMaker)

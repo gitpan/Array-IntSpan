@@ -1,0 +1,25 @@
+$files = {
+           '_<t/get_range.t' => [
+                                  {
+                                    'expr' => undef,
+                                    'value' => '1',
+                                    'text' => '    my $new = $r2->get_range(@{$t->[0]}, $fill) ;
+',
+                                    'fname' => 't/get_range.t',
+                                    'type' => 'user',
+                                    'line' => '54'
+                                  }
+                                ]
+         };
+$expr_list = [
+               {
+                 'expr' => '@extracted',
+                 'depth' => 3
+               },
+               {
+                 'expr' => '@replaced',
+                 'depth' => -1
+               }
+             ];
+$eval_saved_text = undef;
+$main_win_geometry = '800x600+145+326';
