@@ -5,7 +5,7 @@
 # Author: Toby Everett, Dominique Dumont
 #
 ##########################################################################
-# Copyright 2003-2004 Dominique Dumont.  All rights reserved.
+# Copyright 2003-2004,2010 Dominique Dumont.  All rights reserved.
 # Copyright 2000 Toby Everett.  All rights reserved.
 #
 # This file is distributed under the Artistic License. See
@@ -18,9 +18,9 @@
 ##########################################################################
 
 # $Author: domi $
-# $Date: 2004/01/29 16:24:40 $
+# $Date: 2010-09-28 09:35:55 $
 # $Name:  $
-# $Revision: 2.1 $
+# $Revision: 2.2 $
 
 
 use strict;
@@ -28,7 +28,7 @@ use warnings ;
 
 package Array::IntSpan;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 2.1 $ =~ /(\d+)\.(\d+)/;
+our $VERSION = sprintf "%d.%03d", q$Revision: 2.2 $ =~ /(\d+)\.(\d+)/;
 
 sub min { my @a = sort {$a <=> $b} @_ ; return $a[0] ; }
 sub max { my @a = sort {$b <=> $a} @_ ; return $a[0] ; }
@@ -398,6 +398,8 @@ sub lookup {
   my($key) = @_;
 
   my($start, $end) = (0, $#{$self});
+  return undef unless $end >= 0 ; # completely empty span
+
   while ($start < $end) {
     my $mid = int(($start+$end)/2);
     if ($self->[$mid][1] < $key) {
