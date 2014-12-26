@@ -1,3 +1,12 @@
+#
+# This file is part of Array-IntSpan
+#
+# This software is Copyright (c) 2014 by Dominique Dumont.
+#
+# This is free software, licensed under:
+#
+#   The Artistic License 1.0
+#
 ##########################################################################
 #
 # Array::IntSpan::IP - a Module for arrays using IP addresses as indices

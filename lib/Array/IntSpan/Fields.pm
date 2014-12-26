@@ -1,3 +1,12 @@
+#
+# This file is part of Array-IntSpan
+#
+# This software is Copyright (c) 2014 by Dominique Dumont.
+#
+# This is free software, licensed under:
+#
+#   The Artistic License 1.0
+#
 ##########################################################################
 #
 # Array::IntSpan::Fields - IntSpan array using integer fields as indices
@@ -11,20 +20,20 @@
 # the license that comes with your perl distribution.
 #
 # For comments, questions, bugs or general interest, feel free to
-# contact Dominique Dumont dominique.dumont@hp.com
+# contact Dominique Dumont ddumont@cpan.org
 ##########################################################################
 
-# $Author: domi $
-# $Date: 2003/05/26 12:38:32 $
-# $Name:  $
-# $Revision: 1.5 $
+# $Author$
+# $Date$
+# $Name$
+# $Revision$
 
 use strict;
 use warnings; 
 
 package Array::IntSpan::Fields;
 
-our $VERSION = sprintf "%d.%03d", q$Revision: 1.5 $ =~ /(\d+)\.(\d+)/;
+our $VERSION = '2.002';
 
 use Array::IntSpan;
 use Carp ;
@@ -276,7 +285,7 @@ are too great with respect to the filed description.
 
 =head1 AUTHOR
 
-Dominique Dumont, dominique.dumont@hp.com
+Dominique Dumont, ddumont@cpan.org
 
 Copyright (c) 2003 Dominique Dumont. All rights reserved.
 This program is free software; you can redistribute it and/or

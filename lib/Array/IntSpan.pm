@@ -1,3 +1,12 @@
+#
+# This file is part of Array-IntSpan
+#
+# This software is Copyright (c) 2014 by Dominique Dumont.
+#
+# This is free software, licensed under:
+#
+#   The Artistic License 1.0
+#
 ##########################################################################
 #
 # Array::IntSpan - a Module for handling arrays using IntSpan techniques
@@ -5,7 +14,7 @@
 # Author: Toby Everett, Dominique Dumont
 #
 ##########################################################################
-# Copyright 2003-2004,2010 Dominique Dumont.  All rights reserved.
+# Copyright 2003-2004,2010,2014 Dominique Dumont.  All rights reserved.
 # Copyright 2000 Toby Everett.  All rights reserved.
 #
 # This file is distributed under the Artistic License. See
@@ -13,22 +22,15 @@
 # the license that comes with your perl distribution.
 #
 # For comments, questions, bugs or general interest, feel free to
-# contact Dominique Dumont at dominique.dumont@hp.com
+# contact Dominique Dumont at ddumont@cpan.org
 # or Toby Everett at teverett@alascom.att.com
 ##########################################################################
-
-# $Author: domi $
-# $Date: 2010-09-28 09:35:55 $
-# $Name:  $
-# $Revision: 2.2 $
-
 
 use strict;
 use warnings ;
 
 package Array::IntSpan;
-
-our $VERSION = sprintf "%d.%03d", q$Revision: 2.2 $ =~ /(\d+)\.(\d+)/;
+$Array::IntSpan::VERSION = '2.003';
 
 sub min { my @a = sort {$a <=> $b} @_ ; return $a[0] ; }
 sub max { my @a = sort {$b <=> $a} @_ ; return $a[0] ; }
@@ -60,17 +62,35 @@ sub search {
 }
 
 # clear the range. Note the the $self ref is preserved
-sub clear
-  {
+sub clear {
     my $self = shift;
     @$self = () ;
-  }
+}
+
+sub set_range_as_string {
+    my $self = shift;
+    my $str = shift;
+
+    $str =~ s/\s//g;
+
+    foreach my $substr (split /,/, $str) {
+        my @range = $substr =~ /-/ ? split /-/,$substr : ($substr) x 2;
+        $self->set_range(@range, @_);
+    }
+}
+
+sub set {
+    my $self = shift;
+    my $idx = shift;
+
+    $self->set_range($idx, $idx, @_);
+}
 
 sub set_range {
   my $self = shift;
 
   #Test that we were passed appropriate values
-  @_ == 3 or @_ == 4 or 
+  @_ == 3 or @_ == 4 or
     croak("Array::IntSpan::set_range should be called with 3 values and an ".
           "optional code ref.");
   $_[0] <= $_[1] or
@@ -108,7 +128,7 @@ sub get_element
     return @$ref ;
   }
 
-# call-back: 
+# call-back:
 # filler (start, end)
 # copy (start, end, payload )
 # set (start, end, payload)
@@ -126,7 +146,7 @@ sub get_range {
   # Before we binary search, first check if we fall before the range
   if ($end_range < 0 or $self->[$end_range][1] < $start_elem)
     {
-      my @arg = ref($filler) ? 
+      my @arg = ref($filler) ?
         ([$start_elem,$end_elem,&$filler($start_elem,$end_elem)]) :
           defined $filler ? ([@_]) : () ;
       push @$self, @arg if @arg;
@@ -134,9 +154,9 @@ sub get_range {
     }
 
   # Before we binary search, first check if we fall after the range
-  if ($end_elem < $self->[0][0]) 
+  if ($end_elem < $self->[0][0])
     {
-      my @arg = ref($filler) ? 
+      my @arg = ref($filler) ?
         ([$start_elem,$end_elem,&$filler($start_elem,$end_elem)]) :
           defined $filler ? ([@_]) : () ;
       unshift @$self, @arg  if @arg;
@@ -147,14 +167,14 @@ sub get_range {
   my $end   = $self->search($start,$range_size,  $end_elem) ;
 
   my $start_offset = $start_elem - $self->[$start][0] ;
-  my $end_offset   = defined $self->[$end] ? 
+  my $end_offset   = defined $self->[$end] ?
     $end_elem - $self->[$end][0] : undef ;
 
   #print "get_range: start $start, end $end, start_offset $start_offset";
   #print ", end_offset $end_offset" if defined $end_offset ;
   #print "\n";
 
-  my @extracted ; 
+  my @extracted ;
   my @replaced ;
   my $length = 0;
 
@@ -168,7 +188,7 @@ sub get_range {
       # point to the same memory area. But $new must point to the same
       # object
       push @extracted, [ @a ] ;
-      push @replaced,  [ @a ] ; 
+      push @replaced,  [ @a ] ;
     }
 
   if ($self->[$start][0] <= $end_elem)
@@ -214,8 +234,8 @@ sub get_range {
                   push @replaced,  [$start_fill, $end_fill, $new];
                 }
             }
-          push @extracted, [@{$self->[$idx]}]; 
-          push @replaced , [@{$self->[$idx]}]; 
+          push @extracted, [@{$self->[$idx]}];
+          push @replaced , [@{$self->[$idx]}];
           $length++ ;
         }
       #print "\n";
@@ -239,7 +259,7 @@ sub get_range {
             }
         }
 
-      if (defined $end_offset and $end_offset >= 0) 
+      if (defined $end_offset and $end_offset >= 0)
         {
           my $payload = $self->[$end][2] ;
           my $s = $self->[$end][0] ;
@@ -276,7 +296,7 @@ sub clobbered_items {
 }
 
 
-# call-back: 
+# call-back:
 # set (start, end, payload)
 sub consolidate {
   my ($self,$bottom,$top,$set) = @_;
@@ -304,7 +324,7 @@ sub set_consolidate_range {
   my $self = shift;
 
   #Test that we were passed appropriate values
-  @_ == 3 or @_ == 5 or 
+  @_ == 3 or @_ == 5 or
     croak("Array::IntSpan::set_range should be called with 3 values ".
           "and 2 optional code ref.");
   $_[0] <= $_[1] or
@@ -325,8 +345,27 @@ sub set_consolidate_range {
 
 }
 
+# get_range_list
+# scalar context -> return a string
+# list context => returns list of list
+
+sub get_range_list {
+    my ($self, %options) = @_;
+    if (wantarray) {
+        return map { [ @$_[0,1] ] } @$self;
+    }
+    else {
+        return join ', ' , map {
+            my ($a,$b) =  @$_;
+                  $a == $b ? $a
+                : $a+1==$b ? join(', ',$a,$b)
+                :            join('-',$a,$b);
+        } @$self;
+    }
+}
+
 # internal function
-# call-back: 
+# call-back:
 # copy (start, end, payload )
 sub get_splice_parms {
   my $self = shift;
@@ -336,9 +375,9 @@ sub get_splice_parms {
   my $range_size = @$self ; # nb of elements
 
   #Before we binary search, we'll first check to see if this is an append operation
-  if ( $end_range < 0 or 
+  if ( $end_range < 0 or
       $self->[$end_range][1] < $start_elem
-     ) 
+     )
     {
       return defined $value ? ( $range_size, 0, [$start_elem,$end_elem,$value]) :
         ($range_size, 0) ;
@@ -355,7 +394,7 @@ sub get_splice_parms {
   my $end   = $self->search($start,$range_size,  $end_elem) ;
 
   my $start_offset = $start_elem - $self->[$start][0] ;
-  my $end_offset   = defined $self->[$end] ? 
+  my $end_offset   = defined $self->[$end] ?
     $end_elem - $self->[$end][0] : undef ;
 
   #print "get_splice_parms: start $start, end $end, start_offset $start_offset";
@@ -377,8 +416,8 @@ sub get_splice_parms {
   push @modified, [$start_elem,$end_elem,$value] if defined $value ;
 
   #Do a fragmentation check
-  if (defined $end_offset 
-      and $end_offset >= 0 
+  if (defined $end_offset
+      and $end_offset >= 0
       and $end_elem < $self->[$end][1]
      ) {
     my $item = $self->[$end][2] ;
@@ -448,7 +487,7 @@ __END__
 
 =head1 NAME
 
-Array::IntSpan - Handles arrays of scalars or objects using IntSpan techniques
+Array::IntSpan - Handles arrays of scalars or objects using integer ranges
 
 =head1 SYNOPSIS
 
@@ -589,6 +628,23 @@ twice:
 It will be the callback responsability to make sure that the range
 C<0-4> and C<7-10> holds 2 I<different> objects.
 
+=head2 set( index,  value [, code ref] )
+
+Set a single value. This may split an existing range. Actually calls:
+
+ set_range( index, index, value [, code ref] )
+
+=head2 set_range_as_string ( index,  string [, code ref] )
+
+Set one one several ranges specifed with a string. Ranges are separated by "-".
+Several ranges can be specified with commas.
+
+Example:
+
+  set_range_as_string( '1-10,13, 14-20', 'foo')
+
+White space are ignored.
+
 =head2 get_range (start, end [, filler | undef , copy_cb [, set_cb]])
 
 This method returns a range (actually an Array::IntSpan object) from
@@ -671,7 +727,13 @@ To obtain this, get_range will perform the following calls:
  $obj_a1 = &cp(5,6,obj_a);
  &set(3,4,$obj_a) ;
  $obj_b = &cp(9,9,obj_b) ;
- &set(7-8,obj_b) ; 
+ &set(7-8,obj_b) ;
+
+=head2 get_range_list
+
+In scalar context, returns a list of range in a string like: "C<1-5,7,9-11>".
+
+In list context retunrs a list of list, E.g. C< ( [1,5], [7,7], 9,11])>.
 
 =head2 lookup( index )
 
@@ -679,13 +741,13 @@ This method takes as a single parameter the C<index> to look up.  If
 there is an appropriate range, the method will return the associated
 value.  Otherwise, it returns C<undef>.
 
-=head2 get_element( element_number ) 
+=head2 get_element( element_number )
 
 Returns an array containing the Nth range element:
 
  ( start, end, value )
 
-=head2 consolidate( bottom, top , [ set_cb ] )
+=head2 consolidate( [ bottom, top , [ set_cb ]] )
 
 This function scan the range from the range index C<bottom> to C<top>
 and compare the values held by the adjacent ranges. If the values are
@@ -708,6 +770,7 @@ And consolidate will perform this call:
 
  &$set(1,9,obj_a) ;
 
+Consolidate the whole range when called without parameters.
 
 =head1 AUTHOR
 
@@ -719,12 +782,12 @@ Toby Everett, teverett@alascom.att.com
 
 =item *
 
-Dominique Dumont, dominique.dumont@hp.com
+Dominique Dumont, ddumont@cpan.org
 
 =back
 
 Copyright (c) 2000 Toby Everett.
-Copyright (c) 2003-2004 Dominique Dumont. 
+Copyright (c) 2003-2004,2014 Dominique Dumont.
 All rights reserved.  This program is free software.
 
 This module is distributed under the Artistic License. See
